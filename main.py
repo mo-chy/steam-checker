@@ -1,8 +1,14 @@
-from flask import Flask
-import threading, time, random, string, requests
+import requests
+import random
+import string
+import time
+import threading
+import os
 from colorama import Fore, Style, init
+from flask import Flask
 
 init(autoreset=True)
+
 ASCII = f"""{Fore.RED}
 ███████╗████████╗███████╗ █████╗ ███╗   ███╗
 ██╔════╝╚══██╔══╝██╔════╝██╔══██╗████╗ ████║
@@ -14,10 +20,8 @@ ASCII = f"""{Fore.RED}
 
 print(ASCII)
 
-use_webhook = input(Fore.YELLOW + "Send available usernames to webhook? (y/n): ").lower()
-WEBHOOK_URL = None
-if use_webhook == "y":
-    WEBHOOK_URL = input(Fore.YELLOW + "Enter webhook URL: ")
+# Read webhook from environment variable (set in Render dashboard)
+WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
 
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
@@ -37,11 +41,13 @@ def check_username(username):
     except:
         return False
 
+# Generate 3-character combos
 chars = string.ascii_lowercase + "_-"
 all_combos = [''.join([a,b,c]) for a in chars for b in chars for c in chars]
 random.shuffle(all_combos)
 
 def username_loop():
+    print(Fore.CYAN + f"Starting random 3-character username checks... Total combos: {len(all_combos)}\nCTRL+C to stop...\n")
     while True:
         for username in all_combos:
             available = check_username(username)
@@ -60,6 +66,6 @@ def home():
     return "Steam Username Checker Running 24/7!"
 
 if __name__ == "__main__":
-    t = threading.Thread(target=username_loop)
+    t = threading.Thread(target=username_loop, daemon=True)
     t.start()
     app.run(host="0.0.0.0", port=10000)
