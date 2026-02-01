@@ -20,9 +20,7 @@ ASCII = f"""{Fore.RED}
 
 print(ASCII)
 
-# Read webhook from environment variable (set in Render dashboard)
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL")
-
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 def send_webhook(username):
@@ -41,13 +39,13 @@ def check_username(username):
     except:
         return False
 
-# Generate 3-character combos
-chars = string.ascii_lowercase + "_-"
-all_combos = [''.join([a,b,c]) for a in chars for b in chars for c in chars for d in chars]
+# 4-letter combos ONLY
+chars = string.ascii_lowercase
+all_combos = [''.join([a,b,c,d]) for a in chars for b in chars for c in chars for d in chars]
 random.shuffle(all_combos)
 
 def username_loop():
-    print(Fore.CYAN + f"Starting random 3-character username checks... Total combos: {len(all_combos)}\nCTRL+C to stop...\n")
+    print(Fore.CYAN + f"Starting random 4-letter username checks... Total combos: {len(all_combos)}\nCTRL+C to stop...\n")
     while True:
         for username in all_combos:
             available = check_username(username)
@@ -56,9 +54,9 @@ def username_loop():
                 send_webhook(username)
             else:
                 print(Fore.RED + f"[-] {username}")
-            time.sleep(0.5)
+            time.sleep(0.5)  # tweak if you get rate-limited
 
-# Flask server to keep Render alive
+# Flask server to keep alive
 app = Flask(__name__)
 
 @app.route("/")
