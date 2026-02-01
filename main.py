@@ -43,7 +43,7 @@ def check_username(username):
 
 # Generate 3-character combos
 chars = string.ascii_lowercase + "_-"
-all_combos = [''.join([a,b,c]) for a in chars for b in chars for c in chars]
+all_combos = [''.join([a,b,c]) for a in chars for b in chars for c in chars for d in chars]
 random.shuffle(all_combos)
 
 def username_loop():
